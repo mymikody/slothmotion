@@ -1,0 +1,151 @@
+.profile-page{
+    background:#ded8cc;
+    min-height:100vh;
+    padding:40px;
+    font-family:'Baloo-Regular', sans-serif;
+  }
+  
+  /* top nav */
+  
+  .top-bar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  
+  .logo-area{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  
+  .logo{
+    width:40px;
+  }
+  
+  .back-arrow{
+    font-size:30px;
+    cursor:pointer;
+  }
+  
+  /* profile card */
+  
+  .profile-card{
+    background:#edc971;
+    border:3px solid black;
+    border-radius:20px;
+    padding:25px;
+    margin-top:30px;
+  
+    display:flex;
+    gap:30px;
+  }
+  
+  .avatar{
+    width:120px;
+    height:120px;
+    background:black;
+    border-radius:10px;
+  }
+  
+  .profile-right{
+    flex:1;
+  }
+  
+  .profile-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+
+  .profile-header h2{
+    margin: 0;
+    text-align: left;
+  }
+
+  .motions h3 {
+    margin: 0;
+    text-align: left;
+  }
+  
+  .progress-bar{
+    height:16px;
+    background:#eee;
+    border-radius:20px;
+    margin:15px 0;
+  }
+  
+  .progress-fill{
+    width:70%;
+    height:100%;
+    background:linear-gradient(to right,#e57373,#e8a9a9);
+    border-radius:20px;
+  }
+  
+  .motions{
+    display:flex;
+    gap: 10px;
+    align-items:left;
+  }
+  
+  .motions-icon{
+    background:white;
+    padding:12px;
+    border-radius:10px;
+  }
+  
+  /* stats */
+  
+  .stats-container{
+    background:#e5e0d6;
+    margin-top:30px;
+    padding:30px;
+    border-radius:20px;
+    border:2px solid #bfbfbf;
+  
+    display:flex;
+    gap:40px;
+  }
+  
+  .streak-card{
+    background:#4f6f8c;
+    color:#f3b84b;
+    padding:30px;
+    border-radius:15px;
+    width:150px;
+    text-align:center;
+  }
+  
+  .score-card{
+    background:#f0c167;
+    padding:30px;
+    border-radius:15px;
+    width:150px;
+    text-align:center;
+  }
+  
+  .badges{
+    display:grid;
+    grid-template-columns:repeat(3,80px);
+    gap:20px;
+  }
+  
+  .badge{
+    width:80px;
+    height:80px;
+    clip-path:polygon(
+      50% 0%,
+      100% 25%,
+      100% 75%,
+      50% 100%,
+      0% 75%,
+      0% 25%
+    );
+  }
+  
+  .pink{background:#f48fa3;}
+  .purple{background:#b39ddb;}
+  .red{background:#ef9a9a;}
+  .green{background:#a5d6a7;}
+  .yellow{background:#ffe0b2;}
+  .lightgreen{background:#c5e1a5;}
