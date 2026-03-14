@@ -2,7 +2,7 @@ import logo from "../assets/sloth.png"
 import { useState } from "react";
 import "./DanceSelector.css";
 
-const dances = ["RASPUTIN", "MOONWALK", "CHA-CHA"];
+const dances = ["RASPUTIN", "STATESIDE", "XXX"];
 
 export default function DanceSelector() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -38,15 +38,31 @@ export default function DanceSelector() {
 
       <div className="carousel-wrapper">
         <div className="carousel">
-          {dances.map((_, index) => {
-            const position = getPosition(index);
+          {Array.from({ length: 7 }).map((_, renderIndex) => {
+            const position = renderIndex - 3;
 
-            let className = "card hidden";
-            if (position === 0) className = "card center";
-            else if (position === -1) className = "card left";
-            else if (position === 1) className = "card right";
+            const danceIndex =
+              (currentIndex + position + dances.length * 10) % dances.length;
 
-            return <div key={index} className={className} />;
+            let className = "card";
+            if (position === 0) className += " center";
+            else if (position < 0) className += " left";
+            else className += " right";
+
+            if (Math.abs(position) >= 3) className += " far";
+            else if (Math.abs(position) === 2) className += " mid";
+            else if (Math.abs(position) === 1) className += " near";
+
+            return (
+              <div
+                key={renderIndex}
+                className={className}
+              >
+                <div className="card-frame">
+                  <div className="card-inner" />
+                </div>
+              </div>
+            );
           })}
         </div>
       </div>

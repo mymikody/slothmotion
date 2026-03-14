@@ -23,13 +23,17 @@
   }
   
   .dance-page {
-    height: 100vh;
-    width: 100vw;
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    background: #ece7db;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    background: #f3efe4;
+    padding: 1.4rem 1.9rem 2.4rem;
+    font-family: 'Baloo-Regular', Arial, Helvetica, sans-serif;
+    overflow-x: hidden;
+    box-sizing: border-box;
   }
   
   .title {
@@ -58,42 +62,33 @@
   
   .card {
     position: absolute;
-    width: 320px;
-    height: 360px;
-    border-radius: 22px;
-    background: #f0d071;
-    border: 5px solid #5f5f5f;
-    transition: all 0.35s ease;
+    transition:
+      transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.55s ease,
+      filter 0.55s ease;
+    will-change: transform, opacity, filter;
   }
   
-  .card.center {
+  .card-frame {
     width: 340px;
     height: 390px;
-    z-index: 3;
-    opacity: 1;
-    transform: translateX(0) scale(1);
-    border: 5px solid black;
+    background: #ffffff;
+    border: 6px solid #000;
+    border-radius: 28px;
+    padding: 16px;
+    box-sizing: border-box;
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
   }
   
-  .card.left {
-    z-index: 1;
-    opacity: 0.45;
-    transform: translateX(-260px) scale(0.88);
+  .card-inner {
+    width: 100%;
+    height: 100%;
+    background: #f0d071;
+    border: 5px solid #6b6b6b;
+    border-radius: 20px;
+    box-sizing: border-box;
   }
-  
-  .card.right {
-    z-index: 1;
-    opacity: 0.45;
-    transform: translateX(260px) scale(0.88);
-  }
-  
-  .card.hidden {
-    opacity: 0;
-    pointer-events: none;
-    transform: scale(0.7);
-  }
-  
+
   .controls {
     margin-top: 2rem;
     display: flex;
@@ -110,6 +105,16 @@
     color: white;
     font-size: 2rem;
     cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+  }
+  
+  .nav-button:hover {
+    transform: scale(1.08);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+  }
+  
+  .nav-button:active {
+    transform: scale(0.96);
   }
   
   .dance-name {
@@ -120,3 +125,107 @@
     letter-spacing: 1px;
     color: #000;
   }
+
+  .card.center {
+    z-index: 5;
+    opacity: 1;
+    filter: blur(0);
+    transform: translateX(0px) scale(1.02);
+  }
+  
+  .card.near.left {
+    z-index: 4;
+    opacity: 0.5;
+    filter: blur(1px);
+    transform: translateX(-270px) scale(0.88);
+  }
+  
+  .card.near.right {
+    z-index: 4;
+    opacity: 0.5;
+    filter: blur(1px);
+    transform: translateX(270px) scale(0.88);
+  }
+  
+  .card.mid.left {
+    z-index: 3;
+    opacity: 0.22;
+    filter: blur(2px);
+    transform: translateX(-500px) scale(0.76);
+  }
+  
+  .card.mid.right {
+    z-index: 3;
+    opacity: 0.22;
+    filter: blur(2px);
+    transform: translateX(500px) scale(0.76);
+  }
+  
+  .card.far.left {
+    z-index: 2;
+    opacity: 0.08;
+    filter: blur(3px);
+    transform: translateX(-700px) scale(0.64);
+  }
+  
+  .card.far.right {
+    z-index: 2;
+    opacity: 0.08;
+    filter: blur(3px);
+    transform: translateX(700px) scale(0.64);
+  }
+
+  .card.center {
+  z-index: 5;
+  opacity: 1;
+  filter: blur(0);
+  transform: translateX(0px) scale(1.02);
+}
+
+.card.near.left {
+  z-index: 4;
+  opacity: 0.5;
+  filter: blur(1px);
+  transform: translateX(-270px) scale(0.88);
+}
+
+.card.near.right {
+  z-index: 4;
+  opacity: 0.5;
+  filter: blur(1px);
+  transform: translateX(270px) scale(0.88);
+}
+
+.card.mid.left {
+  z-index: 3;
+  opacity: 0.22;
+  filter: blur(2px);
+  transform: translateX(-500px) scale(0.76);
+}
+
+.card.mid.right {
+  z-index: 3;
+  opacity: 0.22;
+  filter: blur(2px);
+  transform: translateX(500px) scale(0.76);
+}
+
+.card.far.left {
+  z-index: 2;
+  opacity: 0.08;
+  filter: blur(3px);
+  transform: translateX(-700px) scale(0.64);
+}
+
+.card.far.right {
+  z-index: 2;
+  opacity: 0.08;
+  filter: blur(3px);
+  transform: translateX(700px) scale(0.64);
+}
+
+.card.center .card-frame {
+box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.22),
+    0 0 0 3px rgba(255, 255, 255, 0.35);
+}
