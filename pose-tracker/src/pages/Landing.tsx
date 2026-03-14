@@ -5,50 +5,92 @@ import Dance from "../assets/Dance.png";
 import Stretch from "../assets/Stretch.png";
 import Excercise from "../assets/Excercise.png";
 import LogoHeader from "../assets/LogoHeader.png";
+import Profile from "../assets/Profile.png";
 
+type FeatureProps = {
+  title: string;
+  image: string;
+  onClick?: () => void;
+};
 
 export default function Landing() {
   return (
     <div className="page">
+
+      <div className="top-stripes"></div>
+
+      <div className="profile-icon">
+          <img src={Profile} alt="profile" />
+      </div>
+
       <header className="header">
- 
-        <div className="logo">
-        <img src={Sloth} alt="Sloth logo" />
+
+        <img
+          src={LogoHeader}
+          alt="header shape"
+          className="header-shape"
+        />
+
+        <div className="header-content">
+          <img src={Sloth} alt="sloth logo" className="header-sloth" />
+          <h1>SlothMotion</h1>
         </div>
 
-        <h1>SLOTHMOTION</h1>
       </header>
 
       <div className="cards">
-        <FeatureCard title="DANCE" image={Dance} description="Fun gentle dancing" onClick={() => alert('Dance card clicked!')} />
-        <FeatureCard title="EXERCISE" image={Excercise} description="Light strength training" />
-        <FeatureCard title="STRETCH" image={Stretch} description="Simple flexibility moves" />
+
+        <FeatureCard
+          title="DANCE"
+          image={Dance}
+          onClick={() => alert("Dance clicked")}
+        />
+
+        <FeatureCard
+          title="EXERCISE"
+          image={Excercise}
+          onClick={() => alert("Exercise clicked")}
+        />
+
+        <FeatureCard
+          title="STRETCH"
+          image={Stretch}
+          onClick={() => alert("Stretch clicked")}
+        />
+
       </div>
 
       <p className="tagline">
         Encouraging seniors to stay active with safe, personalized movement.
       </p>
+
     </div>
   );
 }
 
-type FeatureProps = {
-    title: string;
-    image: string;
-    description: string;
-  };
-  
+function FeatureCard({ title, image, onClick }: FeatureProps) {
+  return (
+    <div className="card" onClick={onClick}>
 
-function FeatureCard({ title, image, description, onClick}: FeatureProps & { onClick?: () => void }) {
-    return (
-      <div className="card" onClick={onClick}>
+      <div className="card-frame">
+
         <div className="card-inner">
+
+          <div className="card-lines"></div>
+
           <h2>{title}</h2>
+
+          <div className="card-lines bottom"></div>
+
           <div className="image">
-          <img src={image} alt={`${title} icon`} />
+            <img src={image} alt={`${title} icon`} />
           </div>
-        <p>{description}</p>
+
+
         </div>
+
       </div>
-    );
-  }
+
+    </div>
+  );
+}
