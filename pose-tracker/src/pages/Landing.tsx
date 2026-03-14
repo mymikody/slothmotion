@@ -8,6 +8,10 @@ import Stretch from "../assets/Stretch.png";
 import Excercise from "../assets/Excercise.png";
 import LogoHeader from "../assets/LogoHeader.png";
 
+type LandingProps = {
+  setPage: (page: string) => void;
+};
+
 const injuryOptions = [
   "Knee pain",
   "Lower back pain",
@@ -21,23 +25,13 @@ const injuryOptions = [
   "None",
 ];
 
-export default function Landing() {
+export default function Landing({ setPage }: LandingProps) {
   const [showInjuryPopup, setShowInjuryPopup] = useState(false);
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
   const [selectedConditions, setSelectedConditions] = useState<string[]>([]);
 
   const goToCard = (card: string) => {
-    if (card === "dance") {
-      window.location.href = "/DanceSelector";
-    }
-
-    if (card === "exercise") {
-      window.location.href = "/ExerciseSelector";
-    }
-
-    if (card === "stretch") {
-      window.location.href = "/StretchSelector";
-    }
+    setPage(card);
   };
 
   const handleCardClick = (card: string) => {
@@ -86,7 +80,10 @@ export default function Landing() {
     <div className="landing-page">
       <div className="landing-top-stripes"></div>
 
-      <div className="landing-profile-icon">
+      <div
+        className="landing-profile-icon"
+        onClick={() => setPage("profile")}
+      >
         <img src={Profile} alt="profile" />
       </div>
 

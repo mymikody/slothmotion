@@ -1,11 +1,16 @@
 import logo from "../assets/sloth.png";
 import { useState } from "react";
 import "./DanceSelector.css";
+
 import bohemianRhapsodyCover from "../assets/bohemianRhapsody.png";
 import stayinAliveCover from "../assets/stayinAlive.jpg";
 import dancingQueenCover from "../assets/dancingQueen.jpg";
 import letItBeCover from "../assets/letItBe.jpg";
 import superstitionCover from "../assets/superstition.jpg";
+
+type DanceSelectorProps = {
+  setPage: (page: string) => void;
+};
 
 const dances = [
   { name: "Bohemian Rhapsody", cover: bohemianRhapsodyCover },
@@ -15,7 +20,7 @@ const dances = [
   { name: "Superstition", cover: superstitionCover },
 ];
 
-export default function DanceSelector() {
+export default function DanceSelector({ setPage }: DanceSelectorProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const prevDance = () => {
@@ -24,6 +29,14 @@ export default function DanceSelector() {
 
   const nextDance = () => {
     setCurrentIndex((prev) => (prev + 1) % dances.length);
+  };
+
+  const handleDanceClick = () => {
+    const selectedDance = dances[currentIndex];
+
+    if (selectedDance.name === "Stayin' Alive") {
+      setPage("demo");
+    }
   };
 
   return (
@@ -46,6 +59,7 @@ export default function DanceSelector() {
               (currentIndex + position + dances.length * 10) % dances.length;
 
             let className = "card";
+
             if (position === 0) className += " center";
             else if (position < 0) className += " left";
             else className += " right";
@@ -55,7 +69,15 @@ export default function DanceSelector() {
             else if (Math.abs(position) === 1) className += " near";
 
             return (
-              <div key={renderIndex} className={className}>
+              <div
+                key={renderIndex}
+                className={className}
+                onClick={() => {
+                  if (position === 0) {
+                    handleDanceClick();
+                  }
+                }}
+              >
                 <div className="card-frame">
                   <div className="card-inner">
                     <div className="album-border">
