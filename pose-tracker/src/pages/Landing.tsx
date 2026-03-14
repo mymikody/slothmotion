@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "./Landing.css";
 
 import Sloth from "../assets/Sloth.png";
