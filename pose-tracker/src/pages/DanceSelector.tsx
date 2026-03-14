@@ -1,8 +1,19 @@
-import logo from "../assets/sloth.png"
+import logo from "../assets/sloth.png";
 import { useState } from "react";
 import "./DanceSelector.css";
+import bohemianRhapsodyCover from "../assets/bohemianRhapsody.png";
+import stayinAliveCover from "../assets/stayinAlive.jpg";
+import dancingQueenCover from "../assets/dancingQueen.jpg";
+import letItBeCover from "../assets/letItBe.jpg";
+import superstitionCover from "../assets/superstition.jpg";
 
-const dances = ["RASPUTIN", "STATESIDE", "XXX"];
+const dances = [
+  { name: "Bohemian Rhapsody", cover: bohemianRhapsodyCover },
+  { name: "Stayin' Alive", cover: stayinAliveCover },
+  { name: "Dancing Queen", cover: dancingQueenCover },
+  { name: "Let It Be", cover: letItBeCover },
+  { name: "Superstition", cover: superstitionCover },
+];
 
 export default function DanceSelector() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -15,25 +26,15 @@ export default function DanceSelector() {
     setCurrentIndex((prev) => (prev + 1) % dances.length);
   };
 
-  const getPosition = (index: number) => {
-    const total = dances.length;
-    let diff = index - currentIndex;
-
-    if (diff > total / 2) diff -= total;
-    if (diff < -total / 2) diff += total;
-
-    return diff;
-  };
-
   return (
-    
     <div className="dance-page">
       <div className="header">
         <div className="logo-section">
-          <img src={logo} className="logo" />
+          <img src={logo} className="logo" alt="SlothMotion logo" />
           <span className="brand">SlothMotion</span>
         </div>
       </div>
+
       <h1 className="title">Select a Dance</h1>
 
       <div className="carousel-wrapper">
@@ -54,12 +55,17 @@ export default function DanceSelector() {
             else if (Math.abs(position) === 1) className += " near";
 
             return (
-              <div
-                key={renderIndex}
-                className={className}
-              >
+              <div key={renderIndex} className={className}>
                 <div className="card-frame">
-                  <div className="card-inner" />
+                  <div className="card-inner">
+                    <div className="album-border">
+                      <img
+                        src={dances[danceIndex].cover}
+                        alt={dances[danceIndex].name}
+                        className="cover"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             );
@@ -72,7 +78,7 @@ export default function DanceSelector() {
           ‹
         </button>
 
-        <span className="dance-name">{dances[currentIndex]}</span>
+        <span className="dance-name">{dances[currentIndex].name}</span>
 
         <button className="nav-button" onClick={nextDance}>
           ›
