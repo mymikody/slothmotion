@@ -9,7 +9,6 @@ import Excercise from "../assets/Excercise.png";
 import LogoHeader from "../assets/LogoHeader.png";
 
 const injuryOptions = [
-  "Back pain",
   "Knee pain",
   "Lower back pain",
   "Hip pain",
@@ -42,16 +41,8 @@ export default function Landing() {
   };
 
   const handleCardClick = (card: string) => {
-    const popupShown = sessionStorage.getItem("injuryPopupShown");
-
     setSelectedCard(card);
-
-    if (!popupShown) {
-      setShowInjuryPopup(true);
-      return;
-    }
-
-    goToCard(card);
+    setShowInjuryPopup(true);
   };
 
   const handleConditionToggle = (condition: string) => {
@@ -70,8 +61,7 @@ export default function Landing() {
     });
   };
 
-  const handlePopupDone = async () => {
-    sessionStorage.setItem("injuryPopupShown", "true");
+  const handlePopupDone = () => {
     sessionStorage.setItem(
       "selectedConditions",
       JSON.stringify(selectedConditions)
@@ -79,19 +69,12 @@ export default function Landing() {
 
     setShowInjuryPopup(false);
 
-    /*
-      Later you can save to your database here too.
-      Example:
-      await saveConditionsToDatabase(selectedConditions);
-    */
-
     if (selectedCard) {
       goToCard(selectedCard);
     }
   };
 
   const handlePopupClose = () => {
-    sessionStorage.setItem("injuryPopupShown", "true");
     setShowInjuryPopup(false);
 
     if (selectedCard) {
@@ -100,84 +83,103 @@ export default function Landing() {
   };
 
   return (
-    <div className="page">
-      <div className="top-stripes"></div>
+    <div className="landing-page">
+      <div className="landing-top-stripes"></div>
 
-      <div className="profile-icon">
+      <div className="landing-profile-icon">
         <img src={Profile} alt="profile" />
       </div>
 
-      <header className="header">
-        <img src={LogoHeader} alt="header" className="header-shape" />
+      <header className="landing-header">
+        <img
+          src={LogoHeader}
+          alt="header"
+          className="landing-header-shape"
+        />
 
-        <div className="header-content">
-          <img src={Sloth} alt="sloth" className="header-sloth" />
-          <h1>SlothMotion</h1>
+        <div className="landing-header-content">
+          <img src={Sloth} alt="sloth" className="landing-header-sloth" />
+          <h1 className="landing-title">SlothMotion</h1>
         </div>
       </header>
 
-      <section className="cards">
-        <div className="card" onClick={() => handleCardClick("dance")}>
-          <div className="card-frame">
-            <div className="card-inner">
-              <div className="card-lines"></div>
+      <section className="landing-cards">
+
+        <div
+          className="landing-card"
+          onClick={() => handleCardClick("dance")}
+        >
+          <div className="landing-card-frame">
+            <div className="landing-card-inner">
+              <div className="landing-card-lines"></div>
               <h2>DANCE</h2>
-              <div className="card-lines bottom"></div>
-              <div className="image">
+              <div className="landing-card-lines bottom"></div>
+              <div className="landing-image">
                 <img src={Dance} alt="Dance" />
               </div>
             </div>
           </div>
         </div>
 
-        <div className="card" onClick={() => handleCardClick("exercise")}>
-          <div className="card-frame">
-            <div className="card-inner">
-              <div className="card-lines"></div>
+        <div
+          className="landing-card"
+          onClick={() => handleCardClick("exercise")}
+        >
+          <div className="landing-card-frame">
+            <div className="landing-card-inner">
+              <div className="landing-card-lines"></div>
               <h2>EXERCISE</h2>
-              <div className="card-lines bottom"></div>
-              <div className="image">
+              <div className="landing-card-lines bottom"></div>
+              <div className="landing-image">
                 <img src={Excercise} alt="Exercise" />
               </div>
             </div>
           </div>
         </div>
 
-        <div className="card" onClick={() => handleCardClick("stretch")}>
-          <div className="card-frame">
-            <div className="card-inner">
-              <div className="card-lines"></div>
+        <div
+          className="landing-card"
+          onClick={() => handleCardClick("stretch")}
+        >
+          <div className="landing-card-frame">
+            <div className="landing-card-inner">
+              <div className="landing-card-lines"></div>
               <h2>STRETCH</h2>
-              <div className="card-lines bottom"></div>
-              <div className="image">
+              <div className="landing-card-lines bottom"></div>
+              <div className="landing-image">
                 <img src={Stretch} alt="Stretch" />
               </div>
             </div>
           </div>
         </div>
+
       </section>
 
-      <p className="tagline">
+      <p className="landing-tagline">
         Encouraging seniors to stay active with safe, personalized movement.
       </p>
 
       {showInjuryPopup && (
-        <div className="popup-overlay">
-          <div className="popup">
-            <button className="popup-close" onClick={handlePopupClose}>
+        <div className="landing-popup-overlay">
+          <div className="landing-popup">
+
+            <button
+              className="landing-popup-close"
+              onClick={handlePopupClose}
+            >
               ✕
             </button>
 
-            <h2 className="popup-title">
+            <h2 className="landing-popup-title">
               Any injuries or medical conditions?
             </h2>
 
-            <div className="popup-search">
+            <div className="landing-popup-search">
               <input type="text" placeholder="Search condition ..." />
-              <span className="popup-search-icon">⌕</span>
+              <span className="landing-popup-search-icon">⌕</span>
             </div>
 
-            <div className="popup-tags">
+            <div className="landing-popup-tags">
               {injuryOptions.map((condition) => {
                 const isSelected = selectedConditions.includes(condition);
 
@@ -185,7 +187,7 @@ export default function Landing() {
                   <button
                     key={condition}
                     type="button"
-                    className={isSelected ? "active-tag" : ""}
+                    className={isSelected ? "landing-active-tag" : ""}
                     onClick={() => handleConditionToggle(condition)}
                   >
                     {condition}
@@ -194,9 +196,13 @@ export default function Landing() {
               })}
             </div>
 
-            <button className="popup-done" onClick={handlePopupDone}>
+            <button
+              className="landing-popup-done"
+              onClick={handlePopupDone}
+            >
               Done
             </button>
+
           </div>
         </div>
       )}
