@@ -9,9 +9,10 @@ export default function Demo() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const poseLandmarkerRef = useRef<PoseLandmarker | null>(null);
   const animationFrameRef = useRef<number | null>(null);
+  const instructorVideoRef = useRef<HTMLVideoElement | null>(null);
 
   const [feedback, setFeedback] = useState("Waiting for camera");
-  const [landmarks, setLandmarks] = useState<PoseLandmarks>([]);
+  const [progress, setProgress] = useState(0);
   const instructorVideoSrc = "../videos/stretch_routine.mp4";
 
   function drawLandmarks(currentLandmarks: PoseLandmarks) {
@@ -91,16 +92,11 @@ export default function Demo() {
 
       const currentLandmarks = result.landmarks?.[0] ?? [];
 
-      setLandmarks(currentLandmarks);
       drawLandmarks(currentLandmarks);
 
       if (currentLandmarks && currentLandmarks.length > 0) {
-        console.log("Landmarks detected:", currentLandmarks.length);
-
         try {
           const nextFeedback = getFeedback(currentLandmarks);
-          console.log("Feedback returned:", nextFeedback);
-
           setFeedback(nextFeedback);
         } catch (err) {
           console.error("Feedback error:", err);
@@ -122,35 +118,68 @@ export default function Demo() {
     };
   }, []);
 
+  useEffect(() => {
+    const instructorVideo = instructorVideoRef.current;
+    if (!instructorVideo) return;
+
+    const updateProgress = () => {
+      if (!instructorVideo.duration || Number.isNaN(instructorVideo.duration)) {
+        setProgress(0);
+        return;
+      }
+
+      const nextProgress =
+        (instructorVideo.currentTime / instructorVideo.duration) * 100;
+      setProgress(nextProgress);
+    };
+
+    const resetProgress = () => {
+      setProgress(0);
+    };
+
+    instructorVideo.addEventListener("timeupdate", updateProgress);
+    instructorVideo.addEventListener("loadedmetadata", updateProgress);
+    instructorVideo.addEventListener("ended", resetProgress);
+
+    return () => {
+      instructorVideo.removeEventListener("timeupdate", updateProgress);
+      instructorVideo.removeEventListener("loadedmetadata", updateProgress);
+      instructorVideo.removeEventListener("ended", resetProgress);
+    };
+  }, []);
+
   return (
     <div
       style={{
-        minHeight: "100vh",
+        height: "100vh",
+        overflow: "hidden",
         background: "#F6F1E7",
-        padding: "24px",
+        padding: "12px 20px",
         fontFamily: "sans-serif",
         boxSizing: "border-box",
+        display: "flex",
+        flexDirection: "column",
       }}
     >
       {/* Top bar */}
       <div
         style={{
           maxWidth: "1200px",
-          margin: "0 auto 18px auto",
+          width: "100%",
+          margin: "0 auto 10px auto",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          flexShrink: 0,
         }}
       >
-        {/* Back arrow placeholder */}
         <button
           style={{
             background: "transparent",
             border: "none",
-            fontSize: "32px",
+            fontSize: "28px",
             cursor: "pointer",
             color: "#1B1B1B",
-            lineHeight: 1,
           }}
         >
           ←
@@ -159,7 +188,7 @@ export default function Demo() {
         <h1
           style={{
             margin: 0,
-            fontSize: "42px",
+            fontSize: "clamp(28px, 4vw, 42px)",
             fontWeight: 800,
             color: "#111",
           }}
@@ -167,34 +196,34 @@ export default function Demo() {
           SlothMotion
         </h1>
 
-        {/* Empty spacer so title stays centered */}
         <div style={{ width: "40px" }} />
       </div>
 
-      {/* Main framed area */}
+      {/* Green frame */}
       <div
         style={{
           maxWidth: "1200px",
+          width: "100%",
           margin: "0 auto",
           background: "#2F5D47",
           borderRadius: "18px",
-          padding: "14px",
+          padding: "12px",
           position: "relative",
-          boxSizing: "border-box",
+          flex: 1,
+          minHeight: 0,
         }}
       >
-        {/* Instructor video area */}
         <div
           style={{
             position: "relative",
             width: "100%",
-            aspectRatio: "16 / 9",
+            height: "100%",
             borderRadius: "10px",
             overflow: "hidden",
             background: "#D8D0C2",
           }}
         >
-          {/* Progress bar overlay at top */}
+          {/* Progress bar */}
           <div
             style={{
               position: "absolute",
@@ -202,26 +231,26 @@ export default function Demo() {
               left: "24px",
               right: "24px",
               zIndex: 2,
-              height: "18px",
+              height: "16px",
               background: "#F3F0EA",
               borderRadius: "999px",
               border: "1px solid #7B7B7B",
               overflow: "hidden",
             }}
           >
-            {/* Example progress fill */}
             <div
               style={{
-                width: "22%",
+                width: `${progress}%`,
                 height: "100%",
                 background: "#A8E2D0",
                 borderRadius: "999px",
+                transition: "width 0.1s linear",
               }}
             />
           </div>
 
-          {/* Main instructor video */}
           <video
+            ref={instructorVideoRef}
             src={instructorVideoSrc}
             autoPlay
             loop
@@ -232,26 +261,23 @@ export default function Demo() {
               width: "100%",
               height: "100%",
               objectFit: "cover",
-              display: "block",
             }}
           />
 
-          {/* User camera box */}
           <div
             style={{
               position: "absolute",
               right: "16px",
               bottom: "16px",
-              width: "28%",
-              maxWidth: "320px",
+              width: "24%",
+              maxWidth: "280px",
               aspectRatio: "4 / 3",
               background: "#000",
               borderRadius: "4px",
               overflow: "hidden",
-              boxShadow: "0 4px 10px rgba(0,0,0,0.25)",
+              transform: "scaleX(-1)",
             }}
           >
-            {/* Webcam feed */}
             <video
               ref={videoRef}
               autoPlay
@@ -263,11 +289,9 @@ export default function Demo() {
                 width: "100%",
                 height: "100%",
                 objectFit: "cover",
-                display: "block",
               }}
             />
 
-            {/* Landmark overlay on top of webcam */}
             <canvas
               ref={canvasRef}
               width="640"
@@ -284,68 +308,46 @@ export default function Demo() {
         </div>
       </div>
 
-      {/* Feedback section under the framed area */}
+      {/* Feedback */}
       <div
         style={{
           maxWidth: "1200px",
-          margin: "18px auto 0 auto",
+          width: "100%",
+          margin: "10px auto 0 auto",
           display: "flex",
           alignItems: "center",
-          gap: "16px",
+          position: "relative",
         }}
       >
-        {/* Sloth image placeholder - replace with your asset if you want */}
-        <div
+        <img
+          src={slothImg}
+          alt="Sloth coach"
           style={{
-            width: "90px",
-            height: "90px",
-            borderRadius: "50%",
-            background: "#E7D6B5",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: "42px",
-            flexShrink: 0,
+            position: "absolute",
+            left: "20px",
+            bottom: "-28px", // moved slightly up
+            width: "240px",
+            height: "240px",
+            objectFit: "contain",
+            pointerEvents: "none",
           }}
-        >
-          <img
-            src={slothImg}
-            alt="Sloth coach"
-            style={{
-              width: "90px",
-              height: "90px",
-              objectFit: "contain",
-            }}
-          />
-        </div>
+        />
 
-        {/* Feedback bubble */}
         <div
           style={{
+            marginLeft: "210px",
             background: "#F3F0EA",
             borderRadius: "24px",
-            padding: "18px 28px",
+            padding: "14px 22px",
             boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
             color: "#2F5D47",
-            fontSize: "24px",
+            fontSize: "clamp(18px, 2.2vw, 24px)",
             fontWeight: 800,
             maxWidth: "700px",
           }}
         >
           {feedback}
         </div>
-      </div>
-
-      {/* Debug info - keep for now while developing */}
-      <div
-        style={{
-          maxWidth: "1200px",
-          margin: "12px auto 0 auto",
-          color: "#555",
-          fontSize: "14px",
-        }}
-      >
-        Detected landmarks: {landmarks.length}
       </div>
     </div>
   );
