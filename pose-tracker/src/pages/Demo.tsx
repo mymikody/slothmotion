@@ -13,7 +13,17 @@ export default function Demo() {
 
   const [feedback, setFeedback] = useState("Waiting for camera");
   const [progress, setProgress] = useState(0);
+
+  // --- feedback smoothing refs ---
+  // currently displayed feedback
+  const displayedFeedbackRef = useRef("Waiting for camera");
+  // candidate feedback that we're waiting to confirm
+  const pendingFeedbackRef = useRef("Waiting for camera");
+  // when the candidate feedback first appeared
+  const pendingSinceRef = useRef<number>(performance.now());
+
   const instructorVideoSrc = "../videos/stretch_routine.mp4";
+  const FEEDBACK_HOLD_MS = 300;
 
   function drawLandmarks(currentLandmarks: PoseLandmarks) {
     const canvas = canvasRef.current;
@@ -30,17 +40,48 @@ export default function Demo() {
     drawingUtils.drawConnectors(currentLandmarks, PoseLandmarker.POSE_CONNECTIONS);
   }
 
+  // helper to avoid flickery feedback changes
+  function updateSmoothedFeedback(nextFeedback: string) {
+    const now = performance.now();
+
+    // if same as what is already displayed, reset pending state
+    if (nextFeedback === displayedFeedbackRef.current) {
+      pendingFeedbackRef.current = nextFeedback;
+      pendingSinceRef.current = now;
+      return;
+    }
+
+    // if this is a new candidate message, start timing it
+    if (nextFeedback !== pendingFeedbackRef.current) {
+      pendingFeedbackRef.current = nextFeedback;
+      pendingSinceRef.current = now;
+      return;
+    }
+
+    // if candidate has stayed stable long enough, show it
+    if (now - pendingSinceRef.current >= FEEDBACK_HOLD_MS) {
+      displayedFeedbackRef.current = nextFeedback;
+      setFeedback(nextFeedback);
+    }
+  }
+
   useEffect(() => {
     let isMounted = true;
+    let stream: MediaStream | null = null;
 
     async function init() {
-      const video = videoRef.current;
-      if (!video) return;
+      const webcamVideo = videoRef.current;
+      const instructorVideo = instructorVideoRef.current;
 
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      if (!webcamVideo || !instructorVideo) return;
 
-      video.srcObject = stream;
-      await video.play();
+      stream = await navigator.mediaDevices.getUserMedia({ video: true });
+
+      webcamVideo.srcObject = stream;
+      await webcamVideo.play();
+
+      instructorVideo.currentTime = 0;
+      await instructorVideo.play();
 
       const vision = await FilesetResolver.forVisionTasks(
         "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
@@ -55,14 +96,24 @@ export default function Demo() {
         numPoses: 1,
       });
 
-      if (!isMounted) return;
+      if (!isMounted) {
+        poseLandmarker.close();
+        return;
+      }
 
       poseLandmarkerRef.current = poseLandmarker;
+
+      displayedFeedbackRef.current = "Camera ready, starting pose detection...";
+      pendingFeedbackRef.current = "Camera ready, starting pose detection...";
+      pendingSinceRef.current = performance.now();
       setFeedback("Camera ready, starting pose detection...");
     }
 
     init().catch((err) => {
       console.error("Error initializing pose landmarker:", err);
+      displayedFeedbackRef.current = "Error initializing pose landmarker";
+      pendingFeedbackRef.current = "Error initializing pose landmarker";
+      pendingSinceRef.current = performance.now();
       setFeedback("Error initializing pose landmarker");
     });
 
@@ -74,36 +125,43 @@ export default function Demo() {
       }
 
       poseLandmarkerRef.current?.close();
+
+      if (stream) {
+        stream.getTracks().forEach((track) => track.stop());
+      }
     };
   }, []);
 
   useEffect(() => {
     function detectFrame() {
-      const video = videoRef.current;
+      const webcamVideo = videoRef.current;
+      const instructorVideo = instructorVideoRef.current;
       const poseLandmarker = poseLandmarkerRef.current;
 
-      if (!video || !poseLandmarker || video.readyState < 2) {
+      if (!webcamVideo || !poseLandmarker || webcamVideo.readyState < 2) {
         animationFrameRef.current = requestAnimationFrame(detectFrame);
         return;
       }
 
       const nowMs = performance.now();
-      const result = poseLandmarker.detectForVideo(video, nowMs);
-
+      const result = poseLandmarker.detectForVideo(webcamVideo, nowMs);
       const currentLandmarks = result.landmarks?.[0] ?? [];
 
       drawLandmarks(currentLandmarks);
 
-      if (currentLandmarks && currentLandmarks.length > 0) {
+      if (currentLandmarks.length > 0) {
         try {
-          const nextFeedback = getFeedback(currentLandmarks);
-          setFeedback(nextFeedback);
+          const currentTime = instructorVideo?.currentTime ?? 0;
+          const nextFeedback = getFeedback(currentLandmarks, currentTime);
+
+          // use smoothed feedback update instead of immediate setFeedback
+          updateSmoothedFeedback(nextFeedback);
         } catch (err) {
           console.error("Feedback error:", err);
-          setFeedback("Error evaluating pose");
+          updateSmoothedFeedback("Error evaluating pose");
         }
       } else {
-        setFeedback("No person detected");
+        updateSmoothedFeedback("No person detected");
       }
 
       animationFrameRef.current = requestAnimationFrame(detectFrame);
@@ -199,7 +257,7 @@ export default function Demo() {
         <div style={{ width: "40px" }} />
       </div>
 
-      {/* Green frame */}
+      {/* Main frame */}
       <div
         style={{
           maxWidth: "1200px",
@@ -249,6 +307,7 @@ export default function Demo() {
             />
           </div>
 
+          {/* Instructor video */}
           <video
             ref={instructorVideoRef}
             src={instructorVideoSrc}
@@ -264,6 +323,7 @@ export default function Demo() {
             }}
           />
 
+          {/* Webcam preview */}
           <div
             style={{
               position: "absolute",
@@ -308,7 +368,7 @@ export default function Demo() {
         </div>
       </div>
 
-      {/* Feedback */}
+      {/* Feedback bubble */}
       <div
         style={{
           maxWidth: "1200px",
@@ -325,7 +385,7 @@ export default function Demo() {
           style={{
             position: "absolute",
             left: "20px",
-            bottom: "-28px", // moved slightly up
+            bottom: "-28px",
             width: "240px",
             height: "240px",
             objectFit: "contain",
