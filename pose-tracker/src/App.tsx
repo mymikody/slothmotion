@@ -1,10 +1,7 @@
-import Landing from "./pages/Landing";
-import Demo from "./pages/Demo";
-
+import DanceSelector from "./pages/DanceSelector";
 
 function App() {
-  return <Landing />;
-  return <Demo />;
+  return <DanceSelector />;
 }
 
 export default App;
