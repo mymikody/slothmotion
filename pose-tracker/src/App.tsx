@@ -1,10 +1,26 @@
+import { useState } from "react";
 import Landing from "./pages/Landing";
-import Demo from "./pages/Demo";
+import Demos from "./pages/Demo";
+import DanceSelector from "./pages/DanceSelector";
+import Profile from "./pages/Profile"
 
 
 function App() {
-  //return <Landing />;
-  return <Demo />;
+  const [page, setPage] = useState("landing");
+
+  if (page === "dance") {
+    return <DanceSelector setPage={setPage} />;
+  }
+
+  if (page === "demo") {
+    return <Demos />;
+  }
+
+  if (page === "profile") {
+    return <Profile setPage={setPage}/>;
+  }
+
+  return <Landing setPage={setPage} />;
 }
 
 export default App;

@@ -1,8 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 import type { PoseLandmarks } from "../pose/poseTypes";
-import { FilesetResolver, PoseLandmarker, DrawingUtils } from "@mediapipe/tasks-vision";
+import {
+  FilesetResolver,
+  PoseLandmarker,
+  DrawingUtils,
+} from "@mediapipe/tasks-vision";
 import { getFeedback } from "../pose/feedback";
 import slothImg from "../assets/Dance.png";
+
+import BestScore from "../assets/BestScore.png";
+import Streak from "../assets/StreakDays.png";
+import Pink from "../assets/PinkBadge.png";
+import GreenBadge from "../assets/GreenBadge.png";
+import PurpleBadge from "../assets/PurpleBadge.png";
+import OrangeBadge from "../assets/OrangeBadge.png";
 
 export default function Demo() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -13,6 +24,8 @@ export default function Demo() {
 
   const [feedback, setFeedback] = useState("Waiting for camera");
   const [progress, setProgress] = useState(0);
+  const [showStatsPopup, setShowStatsPopup] = useState(false);
+
 
   // --- feedback smoothing refs ---
   // currently displayed feedback
@@ -37,7 +50,22 @@ export default function Demo() {
 
     const drawingUtils = new DrawingUtils(ctx);
     drawingUtils.drawLandmarks(currentLandmarks, { radius: 4 });
-    drawingUtils.drawConnectors(currentLandmarks, PoseLandmarker.POSE_CONNECTIONS);
+    drawingUtils.drawConnectors(
+      currentLandmarks,
+      PoseLandmarker.POSE_CONNECTIONS
+    );
+  }
+
+  function finishDemo() {
+    const instructorVideo = instructorVideoRef.current;
+
+    if (instructorVideo) {
+      instructorVideo.pause();
+    }
+
+    setProgress(100);
+    setFeedback("Great job! Session complete.");
+    setShowStatsPopup(true);
   }
 
   // helper to avoid flickery feedback changes
@@ -70,15 +98,15 @@ export default function Demo() {
     let stream: MediaStream | null = null;
 
     async function init() {
-      const webcamVideo = videoRef.current;
+      const video = videoRef.current;
       const instructorVideo = instructorVideoRef.current;
 
-      if (!webcamVideo || !instructorVideo) return;
+      if (!video || !instructorVideo) return;
 
       stream = await navigator.mediaDevices.getUserMedia({ video: true });
 
-      webcamVideo.srcObject = stream;
-      await webcamVideo.play();
+      video.srcObject = stream;
+      await video.play();
 
       instructorVideo.currentTime = 0;
       await instructorVideo.play();
@@ -134,17 +162,22 @@ export default function Demo() {
 
   useEffect(() => {
     function detectFrame() {
-      const webcamVideo = videoRef.current;
+      const video = videoRef.current;
       const instructorVideo = instructorVideoRef.current;
       const poseLandmarker = poseLandmarkerRef.current;
 
-      if (!webcamVideo || !poseLandmarker || webcamVideo.readyState < 2) {
+      if (
+        !video ||
+        !poseLandmarker ||
+        video.readyState < 2 ||
+        showStatsPopup
+      ) {
         animationFrameRef.current = requestAnimationFrame(detectFrame);
         return;
       }
 
       const nowMs = performance.now();
-      const result = poseLandmarker.detectForVideo(webcamVideo, nowMs);
+      const result = poseLandmarker.detectForVideo(video, nowMs);
       const currentLandmarks = result.landmarks?.[0] ?? [];
 
       drawLandmarks(currentLandmarks);
@@ -174,7 +207,7 @@ export default function Demo() {
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, []);
+  }, [showStatsPopup]);
 
   useEffect(() => {
     const instructorVideo = instructorVideoRef.current;
@@ -191,20 +224,25 @@ export default function Demo() {
       setProgress(nextProgress);
     };
 
-    const resetProgress = () => {
-      setProgress(0);
+    const handleEnded = () => {
+      finishDemo();
     };
 
     instructorVideo.addEventListener("timeupdate", updateProgress);
     instructorVideo.addEventListener("loadedmetadata", updateProgress);
-    instructorVideo.addEventListener("ended", resetProgress);
+    instructorVideo.addEventListener("ended", handleEnded);
 
     return () => {
       instructorVideo.removeEventListener("timeupdate", updateProgress);
       instructorVideo.removeEventListener("loadedmetadata", updateProgress);
-      instructorVideo.removeEventListener("ended", resetProgress);
+      instructorVideo.removeEventListener("ended", handleEnded);
     };
   }, []);
+
+  const handleCloseStatsPopup = () => {
+    setShowStatsPopup(false);
+    window.location.href = "/ProfilePage";
+  };
 
   return (
     <div
@@ -254,7 +292,21 @@ export default function Demo() {
           SlothMotion
         </h1>
 
-        <div style={{ width: "40px" }} />
+        <button
+          onClick={finishDemo}
+          style={{
+            background: "#587D67",
+            border: "none",
+            borderRadius: "999px",
+            color: "#fff",
+            fontSize: "14px",
+            fontWeight: 700,
+            padding: "10px 16px",
+            cursor: "pointer",
+          }}
+        >
+          Skip
+        </button>
       </div>
 
       {/* Main frame */}
@@ -312,7 +364,6 @@ export default function Demo() {
             ref={instructorVideoRef}
             src={instructorVideoSrc}
             autoPlay
-            loop
             muted
             playsInline
             controls={false}
@@ -409,6 +460,167 @@ export default function Demo() {
           {feedback}
         </div>
       </div>
+
+      {showStatsPopup && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(80, 76, 68, 0.45)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 20,
+          }}
+        >
+          <div
+            style={{
+              position: "relative",
+              width: "min(86vw, 1100px)",
+              minHeight: "560px",
+              background: "#f3eee2",
+              borderRadius: "24px",
+              boxShadow: "0 8px 24px rgba(0, 0, 0, 0.18)",
+              padding: "5px 56px 40px",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <button
+              className="popup-close"
+              onClick={handleCloseStatsPopup}
+              style={{
+                position: "absolute",
+                top: "28px",
+                right: "28px",
+                width: "52px",
+                height: "52px",
+                border: "none",
+                background: "transparent",
+                fontSize: "34px",
+                cursor: "pointer",
+                color: "#000",
+                lineHeight: 1,
+              }}
+            >
+              ✕
+            </button>
+
+            <h2
+              style={{
+                margin: "90px 0 20px",
+                fontSize: "clamp(2rem, 3vw, 3rem)",
+                color: "#000",
+                textAlign: "center",
+              }}
+            >
+              Session Complete!
+            </h2>
+
+            <p
+              style={{
+                margin: "0 0 32px",
+                fontSize: "clamp(1.2rem, 2vw, 1.6rem)",
+                color: "#000",
+                textAlign: "center",
+                fontWeight: 700,
+              }}
+            >
+              Here are your stats
+            </p>
+
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: "24px",
+                marginBottom: "36px",
+              }}
+            >
+              <img
+                src={Streak}
+                alt="Streak logo"
+                style={{
+                  width: "min(34vw, 280px)",
+                  objectFit: "contain",
+                }}
+              />
+
+              <img
+                src={BestScore}
+                alt="BestScore logo"
+                style={{
+                  width: "min(34vw, 280px)",
+                  objectFit: "contain",
+                }}
+              />
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: "16px",
+                justifyContent: "center",
+                marginBottom: "90px",
+              }}
+            >
+              <img
+                src={Pink}
+                alt="Pink badge"
+                style={{ width: "88px", height: "88px", objectFit: "contain" }}
+              />
+              <img
+                src={GreenBadge}
+                alt="Green"
+                style={{ width: "88px", height: "88px", objectFit: "contain" }}
+              />
+              <img
+                src={PurpleBadge}
+                alt="purple"
+                style={{ width: "88px", height: "88px", objectFit: "contain" }}
+              />
+              <img
+                src={OrangeBadge}
+                alt="orange"
+                style={{ width: "88px", height: "88px", objectFit: "contain" }}
+              />
+              <img
+                src={PurpleBadge}
+                alt="purple"
+                style={{ width: "88px", height: "88px", objectFit: "contain" }}
+              />
+              <img
+                src={GreenBadge}
+                alt="Green"
+                style={{ width: "88px", height: "88px", objectFit: "contain" }}
+              />
+            </div>
+
+            <button
+              onClick={handleCloseStatsPopup}
+              style={{
+                marginTop: "auto",
+                minWidth: "220px",
+                height: "72px",
+                border: "none",
+                borderRadius: "999px",
+                background: "#587d67",
+                color: "#fff",
+                fontFamily: "inherit",
+                fontSize: "1.8rem",
+                cursor: "pointer",
+                boxShadow: "0 4px 0 rgba(0, 0, 0, 0.12)",
+              }}
+            >
+              View Profile
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
