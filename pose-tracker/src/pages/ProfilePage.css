@@ -20,8 +20,10 @@
   }
   
   .logo{
-    width:40px;
+    align-items: right;
+    width: 45px;
   }
+
   
   .back-arrow{
     font-size:30px;
@@ -34,16 +36,17 @@
     background:#edc971;
     border:3px solid black;
     border-radius:20px;
-    padding:25px;
+    padding:60px;
     margin-top:30px;
   
     display:flex;
     gap:30px;
+    position: relative;
   }
   
   .avatar{
-    width:120px;
-    height:120px;
+    width:180px;
+    height:180px;
     background:black;
     border-radius:10px;
   }
@@ -60,27 +63,61 @@
 
   .profile-header h2{
     margin: 0;
+    font-size: 32px;
     text-align: left;
   }
 
+  .profile-header p{
+    font-size: 45;
+    margin: 0;
+  }
+
+  level-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+    width: 100%; /* make container take full card width */
+}
+
+.progress-bar {
+    width: 100%; 
+    height: 16px;
+    background: #eee;
+    border-radius: 20px;
+    margin: 15px 0; 
+}
+
+.progress-fill {
+    width: 70%; 
+    height: 100%;
+    background: linear-gradient(to right,#e57373,#e8a9a9);
+    border-radius: 20px;
+}
+
+.level {
+    font-weight: bold;
+    font-size: 16px;
+    margin: 0;
+    text-align: right;
+}
   .motions h3 {
     margin: 0;
+    font-size: 30px;
     text-align: left;
   }
-  
-  .progress-bar{
-    height:16px;
-    background:#eee;
-    border-radius:20px;
-    margin:15px 0;
+
+  .motions p {
+    margin: 0;
+  }
+
+  .Edit{
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 15px;
   }
   
-  .progress-fill{
-    width:70%;
-    height:100%;
-    background:linear-gradient(to right,#e57373,#e8a9a9);
-    border-radius:20px;
-  }
   
   .motions{
     display:flex;
@@ -90,8 +127,9 @@
   
   .motions-icon{
     background:white;
-    padding:12px;
+    padding:20px;
     border-radius:10px;
+    font-size: 25px;
   }
   
   /* stats */
@@ -106,46 +144,40 @@
     display:flex;
     gap:40px;
   }
-  
-  .streak-card{
-    background:#4f6f8c;
-    color:#f3b84b;
-    padding:30px;
-    border-radius:15px;
-    width:150px;
-    text-align:center;
+
+  .Streak{
+    width: 300px;
+    height: 325px;
   }
-  
-  .score-card{
-    background:#f0c167;
-    padding:30px;
-    border-radius:15px;
-    width:150px;
-    text-align:center;
+
+  .BestScore{
+    width: 300px;
+    height: 325px;
   }
-  
+
   .badges{
     display:grid;
     grid-template-columns:repeat(3,80px);
-    gap:20px;
+    grid-auto-rows: 80px; 
+    gap:100px;
+    align-items: left;  
   }
   
-  .badge{
-    width:80px;
-    height:80px;
-    clip-path:polygon(
-      50% 0%,
-      100% 25%,
-      100% 75%,
-      50% 100%,
-      0% 75%,
-      0% 25%
-    );
+
+  .Pink{
+    width: 150px;
   }
   
-  .pink{background:#f48fa3;}
-  .purple{background:#b39ddb;}
-  .red{background:#ef9a9a;}
-  .green{background:#a5d6a7;}
-  .yellow{background:#ffe0b2;}
-  .lightgreen{background:#c5e1a5;}
+  .Green{
+    width: 150px;
+  }
+
+  .Purple{
+    width: 150px;
+  }
+  
+  .Orange{
+    width: 150px;
+  }
+  
+  

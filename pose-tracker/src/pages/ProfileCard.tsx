@@ -15,13 +15,15 @@ export default function ProfileCard() {
               <h2>Lily James</h2>
               <p>67, Medical condition: back injuries</p>
             </div>
-            <img src={Pencil} alt="Edit logo" className="logo" />
+            <img src={Pencil} alt="Edit logo" className="Edit" />
 
-            <div className="level">lvl. 25</div>
           </div>
   
+        <div className= "level-container">
+         <div className="level">lvl. 25</div>
           <div className="progress-bar">
             <div className="progress-fill"></div>
+          </div>
           </div>
   
           <div className="motions">
