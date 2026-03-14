@@ -1,3 +1,8 @@
+@font-face {
+  font-family: 'Baloo-Regular'; 
+  src: url('./fonts/Baloo-Regular.ttf') format('truetype');
+}
+
 :root {
   --text: #6b6375;
   --text-h: #08060d;
@@ -29,6 +34,7 @@
     font-size: 16px;
   }
 }
+
 
 @media (prefers-color-scheme: dark) {
   :root {
@@ -66,12 +72,6 @@ body {
   margin: 0;
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
-}
 
 h1 {
   font-size: 56px;
