@@ -1,11 +1,12 @@
 import Pencil from "../assets/Pencil.png";
+import OldWoman from "../assets/OldWoman.jpg";
 
 export default function ProfileCard() {
     return (
       <div className="profile-card">
   
         <div className="profile-left">
-          <div className="avatar"></div>
+          <img src={OldWoman} alt="Oldwoman avatar" className="OldWoman" />
         </div>
   
         <div className="profile-right">
