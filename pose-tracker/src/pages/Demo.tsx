@@ -1,8 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 import type { PoseLandmarks } from "../pose/poseTypes";
-import { FilesetResolver, PoseLandmarker, DrawingUtils } from "@mediapipe/tasks-vision";
+import {
+  FilesetResolver,
+  PoseLandmarker,
+  DrawingUtils,
+} from "@mediapipe/tasks-vision";
 import { getFeedback } from "../pose/feedback";
 import slothImg from "../assets/Dance.png";
+
+import BestScore from "../assets/BestScore.png";
+import Streak from "../assets/StreakDays.png";
+import Pink from "../assets/PinkBadge.png";
+import GreenBadge from "../assets/GreenBadge.png";
+import PurpleBadge from "../assets/PurpleBadge.png";
+import OrangeBadge from "../assets/OrangeBadge.png";
 
 export default function Demo() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -13,7 +24,19 @@ export default function Demo() {
 
   const [feedback, setFeedback] = useState("Waiting for camera");
   const [progress, setProgress] = useState(0);
+  const [showStatsPopup, setShowStatsPopup] = useState(false);
+
+
+  // --- feedback smoothing refs ---
+  // currently displayed feedback
+  const displayedFeedbackRef = useRef("Waiting for camera");
+  // candidate feedback that we're waiting to confirm
+  const pendingFeedbackRef = useRef("Waiting for camera");
+  // when the candidate feedback first appeared
+  const pendingSinceRef = useRef<number>(performance.now());
+
   const instructorVideoSrc = "../videos/stretch_routine.mp4";
+  const FEEDBACK_HOLD_MS = 300;
 
   function drawLandmarks(currentLandmarks: PoseLandmarks) {
     const canvas = canvasRef.current;
@@ -27,20 +50,66 @@ export default function Demo() {
 
     const drawingUtils = new DrawingUtils(ctx);
     drawingUtils.drawLandmarks(currentLandmarks, { radius: 4 });
-    drawingUtils.drawConnectors(currentLandmarks, PoseLandmarker.POSE_CONNECTIONS);
+    drawingUtils.drawConnectors(
+      currentLandmarks,
+      PoseLandmarker.POSE_CONNECTIONS
+    );
+  }
+
+  function finishDemo() {
+    const instructorVideo = instructorVideoRef.current;
+
+    if (instructorVideo) {
+      instructorVideo.pause();
+    }
+
+    setProgress(100);
+    setFeedback("Great job! Session complete.");
+    setShowStatsPopup(true);
+  }
+
+  // helper to avoid flickery feedback changes
+  function updateSmoothedFeedback(nextFeedback: string) {
+    const now = performance.now();
+
+    // if same as what is already displayed, reset pending state
+    if (nextFeedback === displayedFeedbackRef.current) {
+      pendingFeedbackRef.current = nextFeedback;
+      pendingSinceRef.current = now;
+      return;
+    }
+
+    // if this is a new candidate message, start timing it
+    if (nextFeedback !== pendingFeedbackRef.current) {
+      pendingFeedbackRef.current = nextFeedback;
+      pendingSinceRef.current = now;
+      return;
+    }
+
+    // if candidate has stayed stable long enough, show it
+    if (now - pendingSinceRef.current >= FEEDBACK_HOLD_MS) {
+      displayedFeedbackRef.current = nextFeedback;
+      setFeedback(nextFeedback);
+    }
   }
 
   useEffect(() => {
     let isMounted = true;
+    let stream: MediaStream | null = null;
 
     async function init() {
       const video = videoRef.current;
-      if (!video) return;
+      const instructorVideo = instructorVideoRef.current;
 
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      if (!video || !instructorVideo) return;
+
+      stream = await navigator.mediaDevices.getUserMedia({ video: true });
 
       video.srcObject = stream;
       await video.play();
+
+      instructorVideo.currentTime = 0;
+      await instructorVideo.play();
 
       const vision = await FilesetResolver.forVisionTasks(
         "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
@@ -55,14 +124,24 @@ export default function Demo() {
         numPoses: 1,
       });
 
-      if (!isMounted) return;
+      if (!isMounted) {
+        poseLandmarker.close();
+        return;
+      }
 
       poseLandmarkerRef.current = poseLandmarker;
+
+      displayedFeedbackRef.current = "Camera ready, starting pose detection...";
+      pendingFeedbackRef.current = "Camera ready, starting pose detection...";
+      pendingSinceRef.current = performance.now();
       setFeedback("Camera ready, starting pose detection...");
     }
 
     init().catch((err) => {
       console.error("Error initializing pose landmarker:", err);
+      displayedFeedbackRef.current = "Error initializing pose landmarker";
+      pendingFeedbackRef.current = "Error initializing pose landmarker";
+      pendingSinceRef.current = performance.now();
       setFeedback("Error initializing pose landmarker");
     });
 
@@ -74,36 +153,48 @@ export default function Demo() {
       }
 
       poseLandmarkerRef.current?.close();
+
+      if (stream) {
+        stream.getTracks().forEach((track) => track.stop());
+      }
     };
   }, []);
 
   useEffect(() => {
     function detectFrame() {
       const video = videoRef.current;
+      const instructorVideo = instructorVideoRef.current;
       const poseLandmarker = poseLandmarkerRef.current;
 
-      if (!video || !poseLandmarker || video.readyState < 2) {
+      if (
+        !video ||
+        !poseLandmarker ||
+        video.readyState < 2 ||
+        showStatsPopup
+      ) {
         animationFrameRef.current = requestAnimationFrame(detectFrame);
         return;
       }
 
       const nowMs = performance.now();
       const result = poseLandmarker.detectForVideo(video, nowMs);
-
       const currentLandmarks = result.landmarks?.[0] ?? [];
 
       drawLandmarks(currentLandmarks);
 
-      if (currentLandmarks && currentLandmarks.length > 0) {
+      if (currentLandmarks.length > 0) {
         try {
-          const nextFeedback = getFeedback(currentLandmarks);
-          setFeedback(nextFeedback);
+          const currentTime = instructorVideo?.currentTime ?? 0;
+          const nextFeedback = getFeedback(currentLandmarks, currentTime);
+
+          // use smoothed feedback update instead of immediate setFeedback
+          updateSmoothedFeedback(nextFeedback);
         } catch (err) {
           console.error("Feedback error:", err);
-          setFeedback("Error evaluating pose");
+          updateSmoothedFeedback("Error evaluating pose");
         }
       } else {
-        setFeedback("No person detected");
+        updateSmoothedFeedback("No person detected");
       }
 
       animationFrameRef.current = requestAnimationFrame(detectFrame);
@@ -116,7 +207,7 @@ export default function Demo() {
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, []);
+  }, [showStatsPopup]);
 
   useEffect(() => {
     const instructorVideo = instructorVideoRef.current;
@@ -133,20 +224,25 @@ export default function Demo() {
       setProgress(nextProgress);
     };
 
-    const resetProgress = () => {
-      setProgress(0);
+    const handleEnded = () => {
+      finishDemo();
     };
 
     instructorVideo.addEventListener("timeupdate", updateProgress);
     instructorVideo.addEventListener("loadedmetadata", updateProgress);
-    instructorVideo.addEventListener("ended", resetProgress);
+    instructorVideo.addEventListener("ended", handleEnded);
 
     return () => {
       instructorVideo.removeEventListener("timeupdate", updateProgress);
       instructorVideo.removeEventListener("loadedmetadata", updateProgress);
-      instructorVideo.removeEventListener("ended", resetProgress);
+      instructorVideo.removeEventListener("ended", handleEnded);
     };
   }, []);
+
+  const handleCloseStatsPopup = () => {
+    setShowStatsPopup(false);
+    window.location.href = "/ProfilePage";
+  };
 
   return (
     <div
@@ -196,10 +292,24 @@ export default function Demo() {
           SlothMotion
         </h1>
 
-        <div style={{ width: "40px" }} />
+        <button
+          onClick={finishDemo}
+          style={{
+            background: "#587D67",
+            border: "none",
+            borderRadius: "999px",
+            color: "#fff",
+            fontSize: "14px",
+            fontWeight: 700,
+            padding: "10px 16px",
+            cursor: "pointer",
+          }}
+        >
+          Skip
+        </button>
       </div>
 
-      {/* Green frame */}
+      {/* Main frame */}
       <div
         style={{
           maxWidth: "1200px",
@@ -249,11 +359,11 @@ export default function Demo() {
             />
           </div>
 
+          {/* Instructor video */}
           <video
             ref={instructorVideoRef}
             src={instructorVideoSrc}
             autoPlay
-            loop
             muted
             playsInline
             controls={false}
@@ -264,6 +374,7 @@ export default function Demo() {
             }}
           />
 
+          {/* Webcam preview */}
           <div
             style={{
               position: "absolute",
@@ -308,7 +419,7 @@ export default function Demo() {
         </div>
       </div>
 
-      {/* Feedback */}
+      {/* Feedback bubble */}
       <div
         style={{
           maxWidth: "1200px",
@@ -325,7 +436,7 @@ export default function Demo() {
           style={{
             position: "absolute",
             left: "20px",
-            bottom: "-28px", // moved slightly up
+            bottom: "-28px",
             width: "240px",
             height: "240px",
             objectFit: "contain",
@@ -349,6 +460,167 @@ export default function Demo() {
           {feedback}
         </div>
       </div>
+
+      {showStatsPopup && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(80, 76, 68, 0.45)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 20,
+          }}
+        >
+          <div
+            style={{
+              position: "relative",
+              width: "min(86vw, 1100px)",
+              minHeight: "560px",
+              background: "#f3eee2",
+              borderRadius: "24px",
+              boxShadow: "0 8px 24px rgba(0, 0, 0, 0.18)",
+              padding: "5px 56px 40px",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <button
+              className="popup-close"
+              onClick={handleCloseStatsPopup}
+              style={{
+                position: "absolute",
+                top: "28px",
+                right: "28px",
+                width: "52px",
+                height: "52px",
+                border: "none",
+                background: "transparent",
+                fontSize: "34px",
+                cursor: "pointer",
+                color: "#000",
+                lineHeight: 1,
+              }}
+            >
+              ✕
+            </button>
+
+            <h2
+              style={{
+                margin: "90px 0 20px",
+                fontSize: "clamp(2rem, 3vw, 3rem)",
+                color: "#000",
+                textAlign: "center",
+              }}
+            >
+              Session Complete!
+            </h2>
+
+            <p
+              style={{
+                margin: "0 0 32px",
+                fontSize: "clamp(1.2rem, 2vw, 1.6rem)",
+                color: "#000",
+                textAlign: "center",
+                fontWeight: 700,
+              }}
+            >
+              Here are your stats
+            </p>
+
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: "24px",
+                marginBottom: "36px",
+              }}
+            >
+              <img
+                src={Streak}
+                alt="Streak logo"
+                style={{
+                  width: "min(34vw, 280px)",
+                  objectFit: "contain",
+                }}
+              />
+
+              <img
+                src={BestScore}
+                alt="BestScore logo"
+                style={{
+                  width: "min(34vw, 280px)",
+                  objectFit: "contain",
+                }}
+              />
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: "16px",
+                justifyContent: "center",
+                marginBottom: "90px",
+              }}
+            >
+              <img
+                src={Pink}
+                alt="Pink badge"
+                style={{ width: "88px", height: "88px", objectFit: "contain" }}
+              />
+              <img
+                src={GreenBadge}
+                alt="Green"
+                style={{ width: "88px", height: "88px", objectFit: "contain" }}
+              />
+              <img
+                src={PurpleBadge}
+                alt="purple"
+                style={{ width: "88px", height: "88px", objectFit: "contain" }}
+              />
+              <img
+                src={OrangeBadge}
+                alt="orange"
+                style={{ width: "88px", height: "88px", objectFit: "contain" }}
+              />
+              <img
+                src={PurpleBadge}
+                alt="purple"
+                style={{ width: "88px", height: "88px", objectFit: "contain" }}
+              />
+              <img
+                src={GreenBadge}
+                alt="Green"
+                style={{ width: "88px", height: "88px", objectFit: "contain" }}
+              />
+            </div>
+
+            <button
+              onClick={handleCloseStatsPopup}
+              style={{
+                marginTop: "auto",
+                minWidth: "220px",
+                height: "72px",
+                border: "none",
+                borderRadius: "999px",
+                background: "#587d67",
+                color: "#fff",
+                fontFamily: "inherit",
+                fontSize: "1.8rem",
+                cursor: "pointer",
+                boxShadow: "0 4px 0 rgba(0, 0, 0, 0.12)",
+              }}
+            >
+              View Profile
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
