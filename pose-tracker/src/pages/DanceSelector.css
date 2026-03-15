@@ -1,19 +1,34 @@
 .header {
     position: absolute;
     top: 20px;
-    left: 30px;
+    right: 30px;  
     display: flex;
   }
   
   .logo-section {
     display: flex;
     align-items: center;
-    gap: 10px;
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.2s ease;
   }
   
+  .logo-section:hover {
+    transform: scale(1.05);
+    opacity: 0.85;
+  }
+
+  .logo-section:hover .logo {
+    transform: rotate(-5deg) scale(1.05);
+  }
+
   .logo {
-    width: 80px;
-    height: 80px;
+    width: clamp(64px, 9vw, 120px);
+    height: clamp(64px, 9vw, 120px);
+    object-fit: contain;
+    flex-shrink: 0;
+  
+    transform: scale(1.5);  
+    transform-origin: right center;
   }
   
   .brand {
@@ -31,14 +46,13 @@
     flex-direction: column;
     align-items: center;
     padding: 1.4rem 1.9rem 2.4rem;
-    font-family: 'Baloo-Regular', Arial, Helvetica, sans-serif;
+    font-family: "Baloo-Regular", Arial, Helvetica, sans-serif;
     overflow-x: hidden;
     box-sizing: border-box;
   }
   
   .title {
     font-size: 3rem;
-    font-weight: 900;
     font-weight: 900;
     color: #000;
     margin-bottom: 2rem;
@@ -53,8 +67,8 @@
   
   .carousel {
     position: relative;
-    width: 900px;
-    height: 420px;
+    width: 1200px;
+    height: 460px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -62,33 +76,122 @@
   
   .card {
     position: absolute;
+    width: 420px;
+    height: 420px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     transition:
-      transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-      opacity 0.55s ease,
-      filter 0.55s ease;
-    will-change: transform, opacity, filter;
+      transform 0.45s ease,
+      opacity 0.45s ease,
+      filter 0.45s ease;
   }
   
   .card-frame {
-    width: 340px;
-    height: 390px;
-    background: #ffffff;
-    border: 6px solid #000;
-    border-radius: 28px;
-    padding: 16px;
+    width: 100%;
+    height: 100%;
+    background: #f3f0e8;
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     box-sizing: border-box;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+    border: 6px solid #7b766f;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.16);
   }
   
   .card-inner {
-    width: 100%;
-    height: 100%;
-    background: #f0d071;
-    border: 5px solid #6b6b6b;
-    border-radius: 20px;
+    width: 86%;
+    height: 86%;
+    background: #efd078;
+    border-radius: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .album-border {
+    width: 82%;
+    height: 82%;
+    background: white;
+    padding: 10px;
+    border-radius: 6px;
     box-sizing: border-box;
   }
 
+  .cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+  
+  /* Center card */
+  .card.center {
+    z-index: 5;
+    opacity: 1;
+    filter: blur(0);
+    transform: translateX(0) scale(1.02);
+  }
+  
+  .card.center .card-frame {
+    border: 7px solid #000;
+    box-shadow:
+      0 10px 24px rgba(0, 0, 0, 0.22),
+      0 0 0 3px rgba(255, 255, 255, 0.35);
+  }
+  
+  
+  /* Near cards */
+  .card.near.left {
+    z-index: 4;
+    opacity: 0.58;
+    filter: blur(0.5px);
+    transform: translateX(-320px) scale(0.88);
+  }
+  
+  .card.near.right {
+    z-index: 4;
+    opacity: 0.58;
+    filter: blur(0.5px);
+    transform: translateX(320px) scale(0.88);
+  }
+  
+  .card.near.left .card-frame,
+  .card.near.right .card-frame {
+    border: 5px solid #8d877f;
+  }
+  
+  /* Mid cards */
+  .card.mid.left {
+    z-index: 3;
+    opacity: 0.24;
+    filter: blur(1.8px);
+    transform: translateX(-560px) scale(0.76);
+  }
+  
+  .card.mid.right {
+    z-index: 3;
+    opacity: 0.24;
+    filter: blur(1.8px);
+    transform: translateX(560px) scale(0.76);
+  }
+  
+  /* Far cards */
+  .card.far.left {
+    z-index: 2;
+    opacity: 0.08;
+    filter: blur(3px);
+    transform: translateX(-760px) scale(0.64);
+  }
+  
+  .card.far.right {
+    z-index: 2;
+    opacity: 0.08;
+    filter: blur(3px);
+    transform: translateX(760px) scale(0.64);
+  }
+  
   .controls {
     margin-top: 2rem;
     display: flex;
@@ -105,7 +208,10 @@
     color: white;
     font-size: 2rem;
     cursor: pointer;
-    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    transition:
+      transform 0.18s ease,
+      box-shadow 0.18s ease,
+      background 0.18s ease;
   }
   
   .nav-button:hover {
@@ -118,114 +224,10 @@
   }
   
   .dance-name {
-    min-width: 220px;
+    min-width: 320px;
     text-align: center;
     font-size: 2rem;
     font-weight: 900;
     letter-spacing: 1px;
     color: #000;
   }
-
-  .card.center {
-    z-index: 5;
-    opacity: 1;
-    filter: blur(0);
-    transform: translateX(0px) scale(1.02);
-  }
-  
-  .card.near.left {
-    z-index: 4;
-    opacity: 0.5;
-    filter: blur(1px);
-    transform: translateX(-270px) scale(0.88);
-  }
-  
-  .card.near.right {
-    z-index: 4;
-    opacity: 0.5;
-    filter: blur(1px);
-    transform: translateX(270px) scale(0.88);
-  }
-  
-  .card.mid.left {
-    z-index: 3;
-    opacity: 0.22;
-    filter: blur(2px);
-    transform: translateX(-500px) scale(0.76);
-  }
-  
-  .card.mid.right {
-    z-index: 3;
-    opacity: 0.22;
-    filter: blur(2px);
-    transform: translateX(500px) scale(0.76);
-  }
-  
-  .card.far.left {
-    z-index: 2;
-    opacity: 0.08;
-    filter: blur(3px);
-    transform: translateX(-700px) scale(0.64);
-  }
-  
-  .card.far.right {
-    z-index: 2;
-    opacity: 0.08;
-    filter: blur(3px);
-    transform: translateX(700px) scale(0.64);
-  }
-
-  .card.center {
-  z-index: 5;
-  opacity: 1;
-  filter: blur(0);
-  transform: translateX(0px) scale(1.02);
-}
-
-.card.near.left {
-  z-index: 4;
-  opacity: 0.5;
-  filter: blur(1px);
-  transform: translateX(-270px) scale(0.88);
-}
-
-.card.near.right {
-  z-index: 4;
-  opacity: 0.5;
-  filter: blur(1px);
-  transform: translateX(270px) scale(0.88);
-}
-
-.card.mid.left {
-  z-index: 3;
-  opacity: 0.22;
-  filter: blur(2px);
-  transform: translateX(-500px) scale(0.76);
-}
-
-.card.mid.right {
-  z-index: 3;
-  opacity: 0.22;
-  filter: blur(2px);
-  transform: translateX(500px) scale(0.76);
-}
-
-.card.far.left {
-  z-index: 2;
-  opacity: 0.08;
-  filter: blur(3px);
-  transform: translateX(-700px) scale(0.64);
-}
-
-.card.far.right {
-  z-index: 2;
-  opacity: 0.08;
-  filter: blur(3px);
-  transform: translateX(700px) scale(0.64);
-}
-
-.card.center .card-frame {
-box-shadow:
-    0 10px 24px rgba(0, 0, 0, 0.22),
-    0 0 0 3px rgba(255, 255, 255, 0.35);
-}
