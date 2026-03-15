@@ -2,6 +2,7 @@ import { useState } from "react";
 import Landing from "./pages/Landing";
 import Demos from "./pages/Demo";
 import DanceSelector from "./pages/DanceSelector";
+import ExerciseSelector from "./pages/ExerciseSelector";
 import Profile from "./pages/Profile"
 
 
@@ -10,6 +11,10 @@ function App() {
 
   if (page === "dance") {
     return <DanceSelector setPage={setPage} />;
+  }
+
+  if (page === "exercise") {
+    return <ExerciseSelector setPage={setPage} />;
   }
 
   if (page === "demo") {
