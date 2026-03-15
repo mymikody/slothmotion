@@ -8,6 +8,7 @@
 
   display:flex;
   flex-direction:column;
+  align-items:center;
 }
 
 /* top nav */
@@ -16,6 +17,7 @@
   display:flex;
   justify-content:space-between;
   align-items:center;
+  width:100%;
 }
 
 .logo-area{
@@ -50,6 +52,9 @@
   display:flex;
   gap:25px;
   position:relative;
+
+  width:100%;
+  max-width:1050px;
 }
 
 .avatar{
@@ -149,13 +154,17 @@
 .stats-container{
   background:#e5e0d6;
   margin-top:15px;
-  padding:20px;
+  padding:25px;
   border-radius:20px;
   border:2px solid #bfbfbf;
 
   display:flex;
-  gap:25px;
-  align-items:flex-start;
+  justify-content:center;
+  align-items:center;
+  gap:60px;
+
+  width:100%;
+  max-width:1050px;
 }
 
 .Streak{
@@ -172,7 +181,7 @@
   display:grid;
   grid-template-columns:repeat(3,80px);
   grid-auto-rows:80px;
-  gap:40px;
+  gap:30px;
 }
 
 .Pink,
