@@ -13,7 +13,7 @@ function App() {
   }
 
   if (page === "demo") {
-    return <Demos />;
+    return <Demos setPage={setPage} />;
   }
 
   if (page === "profile") {

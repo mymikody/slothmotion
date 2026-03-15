@@ -15,7 +15,11 @@ import GreenBadge from "../assets/GreenBadge.png";
 import PurpleBadge from "../assets/PurpleBadge.png";
 import OrangeBadge from "../assets/OrangeBadge.png";
 
-export default function Demo() {
+type DemoProps = {
+  setPage: (page: string) => void;
+};
+
+export default function Demo({ setPage }: DemoProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const poseLandmarkerRef = useRef<PoseLandmarker | null>(null);
@@ -26,13 +30,8 @@ export default function Demo() {
   const [progress, setProgress] = useState(0);
   const [showStatsPopup, setShowStatsPopup] = useState(false);
 
-
-  // --- feedback smoothing refs ---
-  // currently displayed feedback
   const displayedFeedbackRef = useRef("Waiting for camera");
-  // candidate feedback that we're waiting to confirm
   const pendingFeedbackRef = useRef("Waiting for camera");
-  // when the candidate feedback first appeared
   const pendingSinceRef = useRef<number>(performance.now());
 
   const instructorVideoSrc = "../videos/stretch_routine.mp4";
@@ -68,25 +67,21 @@ export default function Demo() {
     setShowStatsPopup(true);
   }
 
-  // helper to avoid flickery feedback changes
   function updateSmoothedFeedback(nextFeedback: string) {
     const now = performance.now();
 
-    // if same as what is already displayed, reset pending state
     if (nextFeedback === displayedFeedbackRef.current) {
       pendingFeedbackRef.current = nextFeedback;
       pendingSinceRef.current = now;
       return;
     }
 
-    // if this is a new candidate message, start timing it
     if (nextFeedback !== pendingFeedbackRef.current) {
       pendingFeedbackRef.current = nextFeedback;
       pendingSinceRef.current = now;
       return;
     }
 
-    // if candidate has stayed stable long enough, show it
     if (now - pendingSinceRef.current >= FEEDBACK_HOLD_MS) {
       displayedFeedbackRef.current = nextFeedback;
       setFeedback(nextFeedback);
@@ -186,8 +181,6 @@ export default function Demo() {
         try {
           const currentTime = instructorVideo?.currentTime ?? 0;
           const nextFeedback = getFeedback(currentLandmarks, currentTime);
-
-          // use smoothed feedback update instead of immediate setFeedback
           updateSmoothedFeedback(nextFeedback);
         } catch (err) {
           console.error("Feedback error:", err);
@@ -239,9 +232,9 @@ export default function Demo() {
     };
   }, []);
 
-  const handleCloseStatsPopup = () => {
+  const handleViewProfile = () => {
     setShowStatsPopup(false);
-    window.location.href = "/ProfilePage";
+    setPage("profile");
   };
 
   return (
@@ -257,7 +250,6 @@ export default function Demo() {
         flexDirection: "column",
       }}
     >
-      {/* Top bar */}
       <div
         style={{
           maxWidth: "1200px",
@@ -270,6 +262,7 @@ export default function Demo() {
         }}
       >
         <button
+          onClick={() => setPage("dance")}
           style={{
             background: "transparent",
             border: "none",
@@ -309,7 +302,6 @@ export default function Demo() {
         </button>
       </div>
 
-      {/* Main frame */}
       <div
         style={{
           maxWidth: "1200px",
@@ -333,7 +325,6 @@ export default function Demo() {
             background: "#D8D0C2",
           }}
         >
-          {/* Progress bar */}
           <div
             style={{
               position: "absolute",
@@ -359,7 +350,6 @@ export default function Demo() {
             />
           </div>
 
-          {/* Instructor video */}
           <video
             ref={instructorVideoRef}
             src={instructorVideoSrc}
@@ -374,7 +364,6 @@ export default function Demo() {
             }}
           />
 
-          {/* Webcam preview */}
           <div
             style={{
               position: "absolute",
@@ -419,7 +408,6 @@ export default function Demo() {
         </div>
       </div>
 
-      {/* Feedback bubble */}
       <div
         style={{
           maxWidth: "1200px",
@@ -488,8 +476,7 @@ export default function Demo() {
             }}
           >
             <button
-              className="popup-close"
-              onClick={handleCloseStatsPopup}
+              onClick={handleViewProfile}
               style={{
                 position: "absolute",
                 top: "28px",
@@ -601,7 +588,7 @@ export default function Demo() {
             </div>
 
             <button
-              onClick={handleCloseStatsPopup}
+              onClick={handleViewProfile}
               style={{
                 marginTop: "auto",
                 minWidth: "220px",
