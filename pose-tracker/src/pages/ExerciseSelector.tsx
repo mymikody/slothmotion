@@ -34,8 +34,20 @@ export default function ExerciseSelector({ setPage }: ExerciseSelectorProps) {
   const handleDanceClick = () => {
     const selectedDance = dances[currentIndex];
 
-    if (selectedDance.name === "Stayin' Alive") {
+    if (selectedDance.name === "Bohemian Rhapsody") {
       setPage("demo");
+    }
+    if (selectedDance.name === "Stayin' Alive") {
+        setPage("demo");
+    }
+    if (selectedDance.name === "Dancing Queen") {
+        setPage("demo");
+    }
+    if (selectedDance.name === "Let It Be") {
+    setPage("demo");
+    }
+    if (selectedDance.name === "Superstition") {
+    setPage("demo");
     }
   };
 
