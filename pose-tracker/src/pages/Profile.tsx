@@ -19,7 +19,13 @@ export default function ProfilePage({ setPage }: ProfilePageProps) {
           <h2>SlothMotion</h2>
         </div>
 
-        <div className="back-arrow">←</div>
+        <div
+          className="back-arrow"
+          onClick={() => setPage("landing")}
+          style={{ cursor: "pointer" }}
+        >
+          ←
+        </div>
       </div>
 
       {/* Profile Card */}

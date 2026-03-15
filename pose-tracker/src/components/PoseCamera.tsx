@@ -2,19 +2,24 @@ import { useEffect, useState } from "react";
 import { getFeedback } from "../pose/feedback";
 import type { PoseLandmarks } from "../pose/poseTypes";
 
-export default function PoseCamera({ landmarks }: { landmarks: PoseLandmarks | null }) {
+export default function PoseCamera({
+  landmarks,
+  currentTime,
+}: {
+  landmarks: PoseLandmarks | null;
+  currentTime: number;
+}) {
   const [feedback, setFeedback] = useState("");
 
   useEffect(() => {
     if (!landmarks) return;
 
-    const newFeedback = getFeedback(landmarks);
+    const newFeedback = getFeedback(landmarks, currentTime);
     setFeedback(newFeedback);
-  }, [landmarks]);
+  }, [landmarks, currentTime]);
 
   return (
     <div>
-      {/* your canvas/video goes here */}
       <p>{feedback}</p>
     </div>
   );
