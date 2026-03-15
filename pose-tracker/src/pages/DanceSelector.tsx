@@ -34,21 +34,37 @@ export default function DanceSelector({ setPage }: DanceSelectorProps) {
   const handleDanceClick = () => {
     const selectedDance = dances[currentIndex];
 
-    if (selectedDance.name === "Stayin' Alive") {
+    if (selectedDance.name === "Bohemian Rhapsody") {
       setPage("demo");
+    }
+    if (selectedDance.name === "Stayin' Alive") {
+        setPage("demo");
+    }
+    if (selectedDance.name === "Dancing Queen") {
+        setPage("demo");
+    }
+    if (selectedDance.name === "Let It Be") {
+    setPage("demo");
+    }
+    if (selectedDance.name === "Superstition") {
+    setPage("demo");
     }
   };
 
   return (
     <div className="dance-page">
       <div className="header">
-        <div className="logo-section">
-          <img src={logo} className="logo" alt="SlothMotion logo" />
-          <span className="brand">SlothMotion</span>
-        </div>
+      <div
+        className="logo-section"
+        onClick={() => setPage("landing")}
+        style={{ cursor: "pointer" }}
+      >
+        <img src={logo} className="logo" alt="SlothMotion logo" />
+        <span className="brand">SlothMotion</span>
+      </div>
       </div>
 
-      <h1 className="title">Select a Dance</h1>
+      <h1 className="title">Select a Dance Routine</h1>
 
       <div className="carousel-wrapper">
         <div className="carousel">

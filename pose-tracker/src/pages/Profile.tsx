@@ -7,13 +7,13 @@ type ProfilePageProps = {
   setPage: (page: string) => void;
 };
 
-
 export default function ProfilePage({ setPage }: ProfilePageProps) {
   return (
     <div className="profile-page">
 
       {/* Top Navigation */}
       <div className="top-bar">
+
         <div className="logo-area">
           <img src={Sloth} alt="Sloth logo" className="logo" />
           <h2>SlothMotion</h2>
