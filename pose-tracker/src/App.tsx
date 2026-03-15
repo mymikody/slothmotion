@@ -17,6 +17,10 @@ function App() {
     return <ExerciseSelector setPage={setPage} />;
   }
 
+  if (page === "stretch") {
+    return <ExerciseSelector setPage={setPage} />;
+  }
+
   if (page === "demo") {
     return <Demos setPage={setPage} />;
   }
