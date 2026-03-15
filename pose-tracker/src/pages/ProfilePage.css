@@ -155,16 +155,17 @@
 
   display:flex;
   gap:25px;
-  flex:1;
-  min-height:0;
+  align-items:flex-start;
 }
 
 .Streak{
   width:220px;
+  height:auto;
 }
 
 .BestScore{
   width:220px;
+  height:auto;
 }
 
 .badges{
