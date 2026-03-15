@@ -281,6 +281,8 @@
 
 /* POP UP */
 
+/* POP UP */
+
 .landing-popup-overlay {
   position: fixed;
   inset: 0;
@@ -304,22 +306,8 @@
   align-items: center;
 }
 
-.landing-popup-close {
-  position: absolute;
-  top: 28px;
-  right: 28px;
-  width: 52px;
-  height: 52px;
-  border: none;
-  background: transparent;
-  font-size: 34px;
-  cursor: pointer;
-  color: #000;
-  line-height: 1;
-}
-
 .landing-popup-title {
-  margin: 90px 0 40px;
+  margin: 40px 0 40px;
   font-size: clamp(2rem, 3vw, 3rem);
   color: #000;
   text-align: center;
@@ -362,7 +350,7 @@
   flex-wrap: wrap;
   gap: 16px 18px;
   justify-content: flex-start;
-  margin-bottom: 90px;
+  margin-bottom: 50px;
 }
 
 .landing-popup-tags button {
@@ -382,18 +370,34 @@
   color: #fff !important;
 }
 
-.landing-popup-done {
+.landing-popup-actions {
+  width: min(100%, 900px);
+  display: flex;
+  justify-content: center;
+  gap: 20px;
   margin-top: auto;
+}
+
+.landing-popup-skip,
+.landing-popup-done {
   min-width: 220px;
   height: 72px;
   border: none;
   border-radius: 999px;
-  background: #587d67;
-  color: #fff;
   font-family: inherit;
   font-size: 1.8rem;
   cursor: pointer;
   box-shadow: 0 4px 0 rgba(0, 0, 0, 0.12);
+}
+
+.landing-popup-skip {
+  background: #d8d2c6;
+  color: #4e4438;
+}
+
+.landing-popup-done {
+  background: #587d67;
+  color: #fff;
 }
 
 @media (max-width: 768px) {
@@ -403,16 +407,8 @@
     padding: 32px 20px 28px;
   }
 
-  .landing-popup-close {
-    top: 16px;
-    right: 16px;
-    width: 42px;
-    height: 42px;
-    font-size: 28px;
-  }
-
   .landing-popup-title {
-    margin: 56px 0 24px;
+    margin: 20px 0 24px;
     font-size: 1.8rem;
   }
 
@@ -424,7 +420,7 @@
 
   .landing-popup-tags {
     gap: 12px;
-    margin-bottom: 40px;
+    margin-bottom: 32px;
   }
 
   .landing-popup-tags button {
@@ -432,8 +428,16 @@
     padding: 12px 18px;
   }
 
+  .landing-popup-actions {
+    width: 100%;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .landing-popup-skip,
   .landing-popup-done {
-    min-width: 180px;
+    width: 100%;
+    min-width: unset;
     height: 58px;
     font-size: 1.3rem;
   }

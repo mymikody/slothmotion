@@ -68,12 +68,10 @@ export default function Landing({ setPage }: LandingProps) {
     }
   };
 
-  const handlePopupClose = () => {
+  const handlePopupSkip = () => {
     setShowInjuryPopup(false);
-
-    if (selectedCard) {
-      goToCard(selectedCard);
-    }
+    setSelectedCard(null);
+    setSelectedConditions([]);
   };
 
   return (
@@ -101,7 +99,6 @@ export default function Landing({ setPage }: LandingProps) {
       </header>
 
       <section className="landing-cards">
-
         <div
           className="landing-card"
           onClick={() => handleCardClick("dance")}
@@ -149,7 +146,6 @@ export default function Landing({ setPage }: LandingProps) {
             </div>
           </div>
         </div>
-
       </section>
 
       <p className="landing-tagline">
@@ -159,14 +155,6 @@ export default function Landing({ setPage }: LandingProps) {
       {showInjuryPopup && (
         <div className="landing-popup-overlay">
           <div className="landing-popup">
-
-            <button
-              className="landing-popup-close"
-              onClick={handlePopupClose}
-            >
-              ✕
-            </button>
-
             <h2 className="landing-popup-title">
               Any injuries or medical conditions?
             </h2>
@@ -193,13 +181,21 @@ export default function Landing({ setPage }: LandingProps) {
               })}
             </div>
 
-            <button
-              className="landing-popup-done"
-              onClick={handlePopupDone}
-            >
-              Done
-            </button>
+            <div className="landing-popup-actions">
+              <button
+                className="landing-popup-skip"
+                onClick={handlePopupSkip}
+              >
+                Skip
+              </button>
 
+              <button
+                className="landing-popup-done"
+                onClick={handlePopupDone}
+              >
+                Done
+              </button>
+            </div>
           </div>
         </div>
       )}
