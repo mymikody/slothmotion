@@ -7,6 +7,7 @@ import {
 } from "@mediapipe/tasks-vision";
 import { getFeedback } from "../pose/feedback";
 import slothImg from "../assets/Dance.png";
+import Sloth from "../assets/Sloth.png";
 
 import BestScore from "../assets/BestScore.png";
 import Streak from "../assets/StreakDays.png";
@@ -244,7 +245,7 @@ export default function Demo({ setPage }: DemoProps) {
         overflow: "hidden",
         background: "#F6F1E7",
         padding: "12px 20px",
-        fontFamily: "sans-serif",
+        fontFamily: "'Baloo-Regular', Arial, Helvetica, sans-serif",
         boxSizing: "border-box",
         display: "flex",
         flexDirection: "column",
@@ -274,16 +275,38 @@ export default function Demo({ setPage }: DemoProps) {
           ←
         </button>
 
-        <h1
+        <div
           style={{
-            margin: 0,
-            fontSize: "clamp(28px, 4vw, 42px)",
-            fontWeight: 800,
-            color: "#111",
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            marginLeft: "auto",
+            marginRight: "auto",
           }}
         >
-          SlothMotion
-        </h1>
+          <img
+            src={Sloth}
+            alt="SlothMotion logo"
+            style={{
+              width: "58px",
+              height: "58px",
+              objectFit: "contain",
+            }}
+          />
+
+          <h1
+            style={{
+              margin: 0,
+              fontSize: "clamp(28px, 4vw, 42px)",
+              color: "#111",
+              fontFamily: "'Baloo-Regular', Arial, Helvetica, sans-serif",
+              fontWeight: 400,
+              lineHeight: 1,
+            }}
+          >
+            SlothMotion
+          </h1>
+        </div>
 
         <button
           onClick={finishDemo}
@@ -597,7 +620,7 @@ export default function Demo({ setPage }: DemoProps) {
                 borderRadius: "999px",
                 background: "#587d67",
                 color: "#fff",
-                fontFamily: "inherit",
+                fontFamily: "'Baloo-Regular', Arial, Helvetica, sans-serif",
                 fontSize: "1.8rem",
                 cursor: "pointer",
                 boxShadow: "0 4px 0 rgba(0, 0, 0, 0.12)",
